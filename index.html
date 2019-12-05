@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title>Medidor Temperatura, Humedad</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+    <script type="text/javascript" src="app.js"></script>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+      google.charts.load('current', {'packages':['gauge']});
+      google.charts.setOnLoadCallback(drawChart);
+      function drawChart() {
+        var data = google.visualization.arrayToDataTable([
+          ['Label', 'Value'],
+          ['Temperatura', 0],
+          ['Humedad', 0],
+          ['Humedad2', 0],
+          ['Humedad3', 0]
+         
+        ]);
+
+        var options = {
+          width: 400, height: 400,
+          redFrom: 0, redTo: 80,
+          greenFrom: 90, greenTo: 100,
+          yellowFrom:80, yellowTo: 90,
+          minorTicks: 5
+        };
+        var chart = new google.visualization.Gauge(document.getElementById('Medidores'));
+        chart.draw(data, options);
+        setInterval(function () {             // Funcion que trate de implementar en el archivo de PROJECTS con los botones, para que me trajera el ultimo dato
+            var JSON=$.ajax({
+                url:"http://localhost:8082/sensores/DatoSensores.php?q=1",
+                dataType: 'json',
+                async: false}).responseText;
+            var Respuesta=jQuery.parseJSON(JSON);
+          data.setValue(0, 1,Respuesta[0].temperatura);
+          data.setValue(1, 1,Respuesta[0].humedad);
+          data.setValue(2, 1,Respuesta[0].humedad2);
+          data.setValue(3, 1,Respuesta[0].humedad3);
+          chart.draw(data, options);
+        }, 1300);
+        
+      }
+    </script>
+</head>
+<body>
+       <div id="Medidores" ></div>
+   
+</body>
+</html>
